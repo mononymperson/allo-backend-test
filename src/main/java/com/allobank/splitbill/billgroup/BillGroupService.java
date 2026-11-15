@@ -2,6 +2,7 @@ package com.allobank.splitbill.billgroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -52,5 +53,9 @@ public class BillGroupService {
         return BillGroupResponse.builder()
                 .name(billGroup.getName())
                 .participants(participants).build();
+    }
+
+    public List<ParticipantResponse> getParticipants(UUID billGroupId) {
+        return participantService.getParticipants(billGroupId);
     }
 }
