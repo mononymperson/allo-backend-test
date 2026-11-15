@@ -1,6 +1,7 @@
 package com.allobank.splitbill.billgroup;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.allobank.splitbill.participant.Participant;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -31,6 +33,9 @@ public class BillGroup {
     @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     private UUID id;
 
+    @Column(length = 100)
+    private String name;
+
     @CreatedDate
     private Instant createdAt;
 
@@ -38,5 +43,10 @@ public class BillGroup {
     private Instant lastModifiedAt;
 
     @OneToMany(mappedBy = "billGroup")
-    private List<Participant> participants;
+    private List<Participant> participants = new ArrayList<>();
+
+    public void addParticipant(Participant participant) {
+        participants.add(participant);
+        participant.setBillGroup(this);
+    }
 }

@@ -20,6 +20,8 @@ Think of a real scenario: a group trip, a team lunch, a shared apartment. People
 
 Everything else is up to you.
 
+The API contract is documented in [API_CONTRACT.md](API_CONTRACT.md).
+
 ---
 
 ## Technical Requirements
