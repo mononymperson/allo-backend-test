@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.allobank.splitbill.billgroup.dto.BillGroupResponse;
 import com.allobank.splitbill.billgroup.dto.CreateBillGroupRequest;
-import com.allobank.splitbill.common.web.ApiResponse;
+import com.allobank.splitbill.common.ApiResponse;
 import com.allobank.splitbill.participant.dto.ParticipantResponse;
 
 @RestController
@@ -32,17 +32,13 @@ public class BillGroupController {
     public ApiResponse<BillGroupResponse> create(@RequestBody CreateBillGroupRequest createBillGroup) {
         BillGroupResponse response = billGroupService.createBillGroup(createBillGroup);
 
-        return ApiResponse.<BillGroupResponse>builder()
-                .message("Bill group created successfully")
-                .data(response)
-                .build();
+        return ApiResponse.success("Bill group created successfully", response);
     }
 
     @GetMapping("/{billGroupId}/participants")
     public ApiResponse<List<ParticipantResponse>> getParticipants(@PathVariable UUID billGroupId) {
-        return ApiResponse.<List<ParticipantResponse>>builder()
-                .message("Participants retrieved successfully")
-                .data(billGroupService.getParticipants(billGroupId))
-                .build();
+        return ApiResponse.success(
+                "Participants retrieved successfully",
+                billGroupService.getParticipants(billGroupId));
     }
 }

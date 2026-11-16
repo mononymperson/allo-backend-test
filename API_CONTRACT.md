@@ -129,10 +129,19 @@ Response: `201 Created`
     "id": "01933c5e-8f00-7abc-8000-000000000004",
     "description": "Dinner",
     "amount": "300000.00",
-    "paidBy": "01933c5e-8f00-7abc-8000-000000000002",
+    "paidBy": {
+      "id": "01933c5e-8f00-7abc-8000-000000000002",
+      "name": "Daus"
+    },
     "forParticipants": [
-      "01933c5e-8f00-7abc-8000-000000000002",
-      "01933c5e-8f00-7abc-8000-000000000003"
+      {
+        "id": "01933c5e-8f00-7abc-8000-000000000002",
+        "name": "Daus"
+      },
+      {
+        "id": "01933c5e-8f00-7abc-8000-000000000003",
+        "name": "Firdaus"
+      }
     ]
   },
   "errors": null

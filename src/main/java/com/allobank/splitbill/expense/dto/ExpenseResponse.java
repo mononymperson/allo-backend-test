@@ -4,25 +4,28 @@ import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
 
-import lombok.Builder;
-import lombok.Data;
+import com.allobank.splitbill.expense.Expense;
+import com.allobank.splitbill.participant.dto.ParticipantResponse;
 
-@Data
-@Builder
-public class ExpenseResponse {
-    private UUID id;
+public record ExpenseResponse(
+        UUID id,
+        String description,
+        ParticipantResponse paidBy,
+        Set<ParticipantResponse> forParticipants,
+        BigDecimal serviceChargeCpt,
+        BigDecimal serviceChargeAmount,
+        BigDecimal subtotal,
+        BigDecimal total) {
 
-    private String description;
-
-    private UUID paidBy;
-
-    private Set<UUID> forParticipants;
-
-    private BigDecimal serviceChargeCpt;
-
-    private BigDecimal serviceChargeAmount;
-
-    private BigDecimal subtotal;
-
-    private BigDecimal total;
+    public static ExpenseResponse from(Expense expense, Set<ParticipantResponse> forParticipants) {
+        return new ExpenseResponse(
+                expense.getId(),
+                expense.getDescription(),
+                ParticipantResponse.from(expense.getPaidBy()),
+                forParticipants,
+                expense.getServiceChargeCpt(),
+                expense.getServiceChargeAmount(),
+                expense.getSubtotal(),
+                expense.getTotal());
+    }
 }

@@ -1,12 +1,10 @@
 package com.allobank.splitbill.participant;
 
-import java.util.Set;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
 
 import com.allobank.splitbill.billgroup.BillGroup;
-import com.allobank.splitbill.expense.Expense;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,7 +36,4 @@ public class Participant {
     @ManyToOne(optional = false)
     @JoinColumn(name = "bill_group_id", nullable = false)
     private BillGroup billGroup;
-
-    @OneToMany(mappedBy = "paidBy")
-    private Set<Expense> paidExpenses;
 }

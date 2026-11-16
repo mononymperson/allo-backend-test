@@ -1,8 +1,6 @@
-
 package com.allobank.splitbill.expense;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -12,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.allobank.splitbill.billgroup.BillGroupService;
 import com.allobank.splitbill.billgroup.dto.BillGroupResponse;
@@ -21,6 +20,7 @@ import com.allobank.splitbill.expense.dto.ExpenseResponse;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2, replace = AutoConfigureTestDatabase.Replace.ANY)
+@Transactional
 public class ExpenseServiceTest {
     @Autowired
     private ExpenseRepository expenseRepository;
@@ -95,35 +95,25 @@ public class ExpenseServiceTest {
 
     @Test
     void testCreateExpense() {
-        CreateBillGroupRequest createBillGroupRequest = new CreateBillGroupRequest();
-
-        createBillGroupRequest.setName("Trip ke bandung");
-
-        List<String> participants = new ArrayList<>();
-
-        participants.add("Daus");
-        participants.add("Firdaus");
-        participants.add("UsDaus");
-
-        createBillGroupRequest.setParticipants(participants);
+        CreateBillGroupRequest createBillGroupRequest = new CreateBillGroupRequest(
+                "Trip ke bandung",
+                List.of("Daus", "Firdaus", "UsDaus"));
 
         BillGroupResponse billGroupResponse = billGroupService.createBillGroup(createBillGroupRequest);
 
         Assertions.assertNotNull(billGroupResponse);
 
-        CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
-
-        createExpenseRequest.setDescription("Makan");
-        createExpenseRequest.setAmount(new BigDecimal(50_500_000));
-        createExpenseRequest.setPaidBy(
-                billGroupResponse.getParticipants().get(0).getId());
-
-        createExpenseRequest.setForParticipants(
+        CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest(
+                null,
+                "Makan",
+                new BigDecimal(50_500_000),
+                billGroupResponse.participants().get(0).id(),
                 Set.of(
-                        billGroupResponse.getParticipants().get(1).getId(),
-                        billGroupResponse.getParticipants().get(2).getId()));
+                        billGroupResponse.participants().get(1).id(),
+                        billGroupResponse.participants().get(2).id()));
 
-        ExpenseResponse expenseResponse = expenseService.createExpense(billGroupResponse.getId(), createExpenseRequest);
+        ExpenseResponse expenseResponse = expenseService.createExpense(
+                billGroupResponse.id(), createExpenseRequest);
 
         BigDecimal expectedSubtotal = new BigDecimal("50500000.00");
         BigDecimal expectedServiceCpt = new BigDecimal(4);
@@ -132,9 +122,9 @@ public class ExpenseServiceTest {
 
         Assertions.assertNotNull(expenseResponse);
         Assertions.assertEquals(1, expenseRepository.count());
-        Assertions.assertEquals(expectedSubtotal, expenseResponse.getSubtotal());
-        Assertions.assertEquals(expectedServiceCpt, expenseResponse.getServiceChargeCpt());
-        Assertions.assertEquals(expectedServiceAmount, expenseResponse.getServiceChargeAmount());
-        Assertions.assertEquals(expectedTotal, expenseResponse.getTotal());
+        Assertions.assertEquals(expectedSubtotal, expenseResponse.subtotal());
+        Assertions.assertEquals(expectedServiceCpt, expenseResponse.serviceChargeCpt());
+        Assertions.assertEquals(expectedServiceAmount, expenseResponse.serviceChargeAmount());
+        Assertions.assertEquals(expectedTotal, expenseResponse.total());
     }
 }

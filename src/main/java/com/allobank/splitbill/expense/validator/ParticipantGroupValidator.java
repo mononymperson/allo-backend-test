@@ -15,16 +15,16 @@ public class ParticipantGroupValidator implements ConstraintValidator<Participan
 
     @Override
     public boolean isValid(CreateExpenseRequest request, ConstraintValidatorContext context) {
-        if (request == null || request.getBillGroupId() == null) {
+        if (request == null || request.billGroupId() == null) {
             return true;
         }
 
         boolean valid = true;
         context.disableDefaultConstraintViolation();
 
-        if (request.getPaidBy() != null) {
+        if (request.paidBy() != null) {
             try {
-                participantService.getParticipantBy(request.getBillGroupId(), request.getPaidBy());
+                participantService.getParticipantBy(request.billGroupId(), request.paidBy());
             } catch (Exception e) {
                 context.buildConstraintViolationWithTemplate("Participant not found in this group")
                         .addPropertyNode("paidBy")
@@ -33,10 +33,10 @@ public class ParticipantGroupValidator implements ConstraintValidator<Participan
             }
         }
 
-        if (request.getForParticipants() != null) {
-            for (UUID participantId : request.getForParticipants()) {
+        if (request.forParticipants() != null) {
+            for (UUID participantId : request.forParticipants()) {
                 try {
-                    participantService.getParticipantBy(request.getBillGroupId(), participantId);
+                    participantService.getParticipantBy(request.billGroupId(), participantId);
                 } catch (Exception e) {
                     context.buildConstraintViolationWithTemplate("Participant not found in this group")
                             .addPropertyNode("forParticipants")

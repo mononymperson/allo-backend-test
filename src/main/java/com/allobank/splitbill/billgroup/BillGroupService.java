@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.allobank.splitbill.billgroup.dto.BillGroupResponse;
 import com.allobank.splitbill.billgroup.dto.CreateBillGroupRequest;
-import com.allobank.splitbill.common.validation.ValidationService;
+import com.allobank.splitbill.common.ResourceNotFoundException;
+import com.allobank.splitbill.common.ValidationService;
 import com.allobank.splitbill.participant.ParticipantService;
-import com.allobank.splitbill.participant.dto.CreateParticipantRequest;
 import com.allobank.splitbill.participant.dto.ParticipantResponse;
 
 import jakarta.transaction.Transactional;
@@ -24,9 +24,8 @@ public class BillGroupService {
     private final ValidationService validationService;
 
     public BillGroup getAndValidateGroupExists(UUID groupId) {
-        BillGroup exists = billGroupRepository.findById(groupId).orElseThrow();
-
-        return exists;
+        return billGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bill group was not found"));
     }
 
     @Transactional
@@ -34,28 +33,25 @@ public class BillGroupService {
         validationService.validate(request);
 
         BillGroup billGroup = new BillGroup();
-
-        billGroup.setName(request.getName());
+        billGroup.setName(request.name());
 
         billGroupRepository.save(billGroup);
 
         List<ParticipantResponse> participants = new ArrayList<>();
-        request.getParticipants().forEach(participant -> {
-            CreateParticipantRequest createParticipant = new CreateParticipantRequest();
+        request.participants()
+                .forEach(name -> participants.add(participantService.createParticipant(billGroup, name)));
 
-            createParticipant.setBillGroup(billGroup);
-            createParticipant.setName(participant);
-
-            participants.add(participantService.createParticipant(createParticipant));
-        });
-
-        return BillGroupResponse.builder()
-                .id(billGroup.getId())
-                .name(billGroup.getName())
-                .participants(participants).build();
+        return new BillGroupResponse(
+                billGroup.getId(),
+                billGroup.getName(),
+                billGroup.getCreatedAt(),
+                billGroup.getLastModifiedAt(),
+                participants);
     }
 
     public List<ParticipantResponse> getParticipants(UUID billGroupId) {
+        getAndValidateGroupExists(billGroupId);
+
         return participantService.getParticipants(billGroupId);
     }
 }

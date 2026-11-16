@@ -7,24 +7,26 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jpa.test.autoconfigure.AutoConfigureTestEntityManager;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
 import com.allobank.splitbill.billgroup.BillGroup;
-import com.allobank.splitbill.billgroup.BillGroupRepository;
 
 @DataJpaTest
+@AutoConfigureTestEntityManager
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2, replace = AutoConfigureTestDatabase.Replace.ANY)
-public class ParticipantRepositoryTest {
+class ParticipantRepositoryTest {
     @Autowired
     private ParticipantRepository participantRepository;
 
     @Autowired
-    private BillGroupRepository billGroupRepository;
+    private TestEntityManager entityManager;
 
     @Test
     void shouldCreateParticipant() {
-        BillGroup billGroup = billGroupRepository.save(new BillGroup());
+        BillGroup billGroup = entityManager.persist(new BillGroup());
 
         assertThat(billGroup.getId()).isNotNull();
 
@@ -78,7 +80,7 @@ public class ParticipantRepositoryTest {
     }
 
     private Participant saveParticipant(String name) {
-        BillGroup billGroup = billGroupRepository.save(new BillGroup());
+        BillGroup billGroup = entityManager.persist(new BillGroup());
 
         Participant participant = new Participant();
         participant.setName(name);

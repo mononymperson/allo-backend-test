@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.allobank.splitbill.billgroup.BillGroup;
 import com.allobank.splitbill.billgroup.BillGroupService;
-import com.allobank.splitbill.common.validation.ValidationService;
+import com.allobank.splitbill.common.ValidationService;
 import com.allobank.splitbill.expense.dto.CreateExpenseRequest;
 import com.allobank.splitbill.expense.dto.ExpenseResponse;
 import com.allobank.splitbill.participant.Participant;
@@ -52,29 +52,21 @@ public class ExpenseService {
 
         Expense expense = new Expense();
 
-        Participant payer = participantService.getParticipantBy(billGroupId, expenseRequest.getPaidBy());
+        Participant payer = participantService.getParticipantBy(billGroupId, expenseRequest.paidBy());
 
         BigDecimal serviceChargePct = calculateServiceChargePct();
-        BigDecimal serviceChargeAmount = calculateServiceAmount(expenseRequest.getAmount(), serviceChargePct);
+        BigDecimal serviceChargeAmount = calculateServiceAmount(expenseRequest.amount(), serviceChargePct);
 
         expense.setBillGroup(billGroup);
-        expense.setDescription(expenseRequest.getDescription());
+        expense.setDescription(expenseRequest.description());
         expense.setPaidBy(payer);
-        expense.setSubtotal(expenseRequest.getAmount().setScale(2, RoundingMode.UNNECESSARY));
+        expense.setSubtotal(expenseRequest.amount().setScale(2, RoundingMode.UNNECESSARY));
         expense.setServiceChargeCpt(serviceChargePct);
         expense.setServiceChargeAmount(serviceChargeAmount);
-        expense.setTotal(expenseRequest.getAmount().add(serviceChargeAmount));
+        expense.setTotal(expenseRequest.amount().add(serviceChargeAmount));
 
         expenseRepository.save(expense);
 
-        return ExpenseResponse.builder()
-                .description(expense.getDescription())
-                .serviceChargeCpt(expense.getServiceChargeCpt())
-                .serviceChargeAmount(expense.getServiceChargeAmount())
-                .subtotal(expense.getSubtotal())
-                .total(expense.getTotal())
-                .paidBy(expense.getPaidBy().getId())
-                .forParticipants(expenseRequest.getForParticipants()).build();
-
+        return ExpenseResponse.from(expense, null);
     }
 }

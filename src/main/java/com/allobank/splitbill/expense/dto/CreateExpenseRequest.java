@@ -9,25 +9,23 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
 
 @ParticipantGroup
-@Data
-public class CreateExpenseRequest {
-    @JsonIgnore
-    private UUID billGroupId;
+public record CreateExpenseRequest(
+        @JsonIgnore
+        UUID billGroupId,
 
-    @NotNull
-    @Size(max = 255)
-    private String description;
+        @NotNull
+        @Size(max = 255)
+        String description,
 
-    @NotNull
-    private BigDecimal amount;
+        @NotNull
+        BigDecimal amount,
 
-    @NotNull
-    private UUID paidBy;
+        @NotNull
+        UUID paidBy,
 
-    @NotNull
-    @Size(min = 1)
-    private Set<UUID> forParticipants;
+        @NotNull
+        @Size(min = 1)
+        Set<UUID> forParticipants) {
 }

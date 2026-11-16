@@ -1,4 +1,4 @@
-package com.allobank.splitbill.common.validation;
+package com.allobank.splitbill.common;
 
 import java.util.Map;
 

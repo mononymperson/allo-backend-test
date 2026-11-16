@@ -2,12 +2,10 @@ package com.allobank.splitbill.participant.dto;
 
 import java.util.UUID;
 
-import lombok.Builder;
-import lombok.Data;
+import com.allobank.splitbill.participant.Participant;
 
-@Data
-@Builder
-public class ParticipantResponse {
-    private UUID id;
-    private String name;
+public record ParticipantResponse(UUID id, String name) {
+    public static ParticipantResponse from(Participant participant) {
+        return new ParticipantResponse(participant.getId(), participant.getName());
+    }
 }
