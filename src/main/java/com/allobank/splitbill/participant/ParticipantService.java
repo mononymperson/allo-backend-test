@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.allobank.splitbill.billgroup.BillGroupRepository;
 import com.allobank.splitbill.common.validation.ValidationService;
 import com.allobank.splitbill.common.web.ResourceNotFoundException;
-import com.allobank.splitbill.billgroup.BillGroupRepository;
 import com.allobank.splitbill.participant.dto.CreateParticipantRequest;
 import com.allobank.splitbill.participant.dto.ParticipantResponse;
 
@@ -23,8 +23,7 @@ public class ParticipantService {
     ParticipantService(
             ParticipantRepository participantRepository,
             ValidationService validationService,
-            BillGroupRepository billGroupRepository
-    ) {
+            BillGroupRepository billGroupRepository) {
         this.participantRepository = participantRepository;
         this.validationService = validationService;
         this.billGroupRepository = billGroupRepository;
@@ -59,5 +58,12 @@ public class ParticipantService {
                         .name(participant.getName())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public Participant getParticipantBy(UUID groupId, UUID participantId) {
+        Participant participant = participantRepository.findFirstByIdAndBillGroupId(participantId, groupId)
+                .orElseThrow();
+
+        return participant;
     }
 }

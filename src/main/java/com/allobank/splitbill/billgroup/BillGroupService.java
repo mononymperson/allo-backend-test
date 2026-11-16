@@ -14,20 +14,19 @@ import com.allobank.splitbill.participant.dto.CreateParticipantRequest;
 import com.allobank.splitbill.participant.dto.ParticipantResponse;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class BillGroupService {
     private final ParticipantService participantService;
     private final BillGroupRepository billGroupRepository;
     private final ValidationService validationService;
 
-    BillGroupService(
-            BillGroupRepository billGroupRepository,
-            ParticipantService participantService,
-            ValidationService validationService) {
-        this.billGroupRepository = billGroupRepository;
-        this.participantService = participantService;
-        this.validationService = validationService;
+    public BillGroup getAndValidateGroupExists(UUID groupId) {
+        BillGroup exists = billGroupRepository.findById(groupId).orElseThrow();
+
+        return exists;
     }
 
     @Transactional
@@ -51,6 +50,7 @@ public class BillGroupService {
         });
 
         return BillGroupResponse.builder()
+                .id(billGroup.getId())
                 .name(billGroup.getName())
                 .participants(participants).build();
     }
