@@ -17,6 +17,7 @@ import com.allobank.splitbill.billgroup.dto.BillGroupResponse;
 import com.allobank.splitbill.billgroup.dto.CreateBillGroupRequest;
 import com.allobank.splitbill.expense.dto.CreateExpenseRequest;
 import com.allobank.splitbill.expense.dto.ExpenseResponse;
+import com.allobank.splitbill.expense.split.dto.ExpenseSplitInfo;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2, replace = AutoConfigureTestDatabase.Replace.ANY)
@@ -119,6 +120,7 @@ public class ExpenseServiceTest {
         BigDecimal expectedServiceCpt = new BigDecimal(4);
         BigDecimal expectedServiceAmount = new BigDecimal("2020000.00");
         BigDecimal expectedTotal = new BigDecimal("52520000.00");
+        BigDecimal expectedSplitAmount = new BigDecimal("26260000.00");
 
         Assertions.assertNotNull(expenseResponse);
         Assertions.assertEquals(1, expenseRepository.count());
@@ -126,5 +128,16 @@ public class ExpenseServiceTest {
         Assertions.assertEquals(expectedServiceCpt, expenseResponse.serviceChargeCpt());
         Assertions.assertEquals(expectedServiceAmount, expenseResponse.serviceChargeAmount());
         Assertions.assertEquals(expectedTotal, expenseResponse.total());
+
+        // expense split check
+        Assertions.assertEquals(2, expenseResponse.forParticipants().size());
+        Assertions.assertEquals(expectedSplitAmount, expenseResponse.forParticipants().get(0).amount());
+
+        List<String> splitParticipantNames = expenseResponse.forParticipants().stream()
+                .map(ExpenseSplitInfo::name)
+                .toList();
+        Assertions.assertTrue(
+                splitParticipantNames.containsAll(List.of("Firdaus", "UsDaus")),
+                "expected split participants [Firdaus, UsDaus] but was: " + splitParticipantNames);
     }
 }

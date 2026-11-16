@@ -1,6 +1,7 @@
 package com.allobank.splitbill.participant;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -12,18 +13,13 @@ import com.allobank.splitbill.participant.dto.CreateParticipantRequest;
 import com.allobank.splitbill.participant.dto.ParticipantResponse;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class ParticipantService {
     private final ParticipantRepository participantRepository;
     private final ValidationService validationService;
-
-    ParticipantService(
-            ParticipantRepository participantRepository,
-            ValidationService validationService) {
-        this.participantRepository = participantRepository;
-        this.validationService = validationService;
-    }
 
     @Transactional
     public ParticipantResponse createParticipant(BillGroup billGroup, String name) {
@@ -48,5 +44,12 @@ public class ParticipantService {
     public Participant getParticipantBy(UUID groupId, UUID participantId) {
         return participantRepository.findByIdAndBillGroupId(participantId, groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Participant was not found"));
+    }
+
+    public List<Participant> getParticipantsBy(
+            Set<UUID> participants,
+            UUID groupId) {
+        return participantRepository.findAllByIdInAndBillGroup_Id(participants, groupId);
+
     }
 }
