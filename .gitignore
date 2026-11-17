@@ -38,3 +38,6 @@ build/
 .vscode/
 
 *.http
+### Local overrides ###
+.env
+application-local.properties

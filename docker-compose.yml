@@ -8,27 +8,26 @@ services:
         condition: service_healthy
     environment:
       SERVER_PORT: 4110
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/splitbill
-      SPRING_DATASOURCE_USERNAME: splitbill
-      SPRING_DATASOURCE_PASSWORD: splitbill
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-splitbill}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-splitbill}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-splitbill}
 
   mysql:
     image: mysql:8.4
     environment:
-      MYSQL_DATABASE: splitbill
-      MYSQL_USER: splitbill
-      MYSQL_PASSWORD: splitbill
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-splitbill}
+      MYSQL_USER: ${MYSQL_USER:-splitbill}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-splitbill}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
     ports:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}"]
       interval: 5s
       timeout: 5s
       retries: 20
 
 volumes:
   mysql-data:
- 
