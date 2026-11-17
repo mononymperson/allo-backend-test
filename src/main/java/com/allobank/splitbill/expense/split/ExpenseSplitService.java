@@ -3,6 +3,7 @@ package com.allobank.splitbill.expense.split;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -40,5 +41,9 @@ public class ExpenseSplitService {
         });
 
         return expenseSplitInfos;
+    }
+
+    public List<ExpenseSplit> getSplitsBy(UUID billGroupId) {
+        return expenseSplitRepository.findAllByExpense_BillGroup_Id(billGroupId);
     }
 }

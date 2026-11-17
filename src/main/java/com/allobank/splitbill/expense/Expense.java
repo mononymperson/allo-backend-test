@@ -40,15 +40,6 @@ public class Expense {
     @JoinColumn(name = "paid_by_id", nullable = false)
     private Participant paidBy;
 
-    @Column(precision = 5, scale = 2)
-    private BigDecimal serviceChargeCpt;
-
-    @Column(precision = 15, scale = 2)
-    private BigDecimal serviceChargeAmount;
-
-    @Column(precision = 15, scale = 2)
-    private BigDecimal subtotal;
-
     @Column(precision = 15, scale = 2)
     private BigDecimal total;
 }

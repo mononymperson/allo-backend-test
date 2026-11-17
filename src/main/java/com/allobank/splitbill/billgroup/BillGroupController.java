@@ -19,7 +19,7 @@ import com.allobank.splitbill.common.ApiResponse;
 import com.allobank.splitbill.participant.dto.ParticipantResponse;
 
 @RestController
-@RequestMapping("/bill-groups")
+@RequestMapping(path = "/bill-groups")
 public class BillGroupController {
     private final BillGroupService billGroupService;
 

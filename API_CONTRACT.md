@@ -39,8 +39,8 @@ Request:
 {
   "name": "Trip Bandung",
   "participants": [
-    { "name": "Budi" },
-    { "name": "Andi" }
+    "Budi",
+    "Andi" 
   ]
 }
 ```
@@ -111,7 +111,7 @@ Request:
 ```json
 {
   "description": "Dinner",
-  "amount": "300000.00",
+  "amount": 300000,
   "paidBy": "01933c5e-8f00-7abc-8000-000000000002",
   "forParticipants": [
     "01933c5e-8f00-7abc-8000-000000000002",
@@ -126,25 +126,28 @@ Response: `201 Created`
 {
   "message": "Expense created successfully",
   "data": {
-    "id": "01933c5e-8f00-7abc-8000-000000000004",
-    "description": "Dinner",
-    "amount": "300000.00",
+    "id": "01a1e568-05ad-7534-bf17-9bf550cc38ba",
+    "description": "",
+    "total": 300000.00,
     "paidBy": {
-      "id": "01933c5e-8f00-7abc-8000-000000000002",
+      "id": "01a1e564-2f41-7708-bf64-4946bc8aa2a0",
       "name": "Daus"
     },
     "forParticipants": [
       {
-        "id": "01933c5e-8f00-7abc-8000-000000000002",
-        "name": "Daus"
+        "id": "01a1e568-05ad-7c06-93db-d3fcd9562818",
+        "name": "Daus",
+        "amount": 156000.00
       },
       {
-        "id": "01933c5e-8f00-7abc-8000-000000000003",
-        "name": "Firdaus"
+        "id": "01a1e568-05ad-7fa0-abf1-7af9352a46f3",
+        "name": "Firdaus",
+        "amount": 156000.00
       }
-    ]
+    ],
   },
   "errors": null
+
 }
 ```
 
@@ -162,15 +165,38 @@ Response: `200 OK`
 {
   "message": "Settlement calculated successfully",
   "data": {
-    "billGroupId": "01933c5e-8f00-7abc-8000-000000000001",
-    "totalExpenses": "300000.00",
-    "service_charge_pct": 5,
-    "service_charge_amount": "15000.00",
+    "billGroup": {
+      "id": "01933c5e-8f00-7abc-8000-000000000001",
+      "name": "Dinner Trip"
+    },
+    "summary": {
+      "totalExpenses": "300000.00",
+      "serviceChargePct": "5",
+      "serviceChargeAmount": "15000.00",
+      "grandTotal": "315000.00"
+    },
     "transfers": [
       {
-        "fromParticipantId": "01933c5e-8f00-7abc-8000-000000000003",
-        "toParticipantId": "01933c5e-8f00-7abc-8000-000000000002",
-        "amount": "150000.00"
+        "from": {
+          "id": "01933c5e-8f00-7abc-8000-000000000003",
+          "name": "Firdaus"
+        },
+        "to": {
+          "id": "01933c5e-8f00-7abc-8000-000000000002",
+          "name": "Daus"
+        },
+        "amount": "105000.00"
+      },
+      {
+        "from": {
+          "id": "01933c5e-8f00-7abc-8000-000000000004",
+          "name": "UsDaus"
+        },
+        "to": {
+          "id": "01933c5e-8f00-7abc-8000-000000000002",
+          "name": "Daus"
+        },
+        "amount": "105000.00"
       }
     ]
   },

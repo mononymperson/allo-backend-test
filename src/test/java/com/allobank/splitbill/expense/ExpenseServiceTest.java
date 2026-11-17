@@ -23,121 +23,53 @@ import com.allobank.splitbill.expense.split.dto.ExpenseSplitInfo;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2, replace = AutoConfigureTestDatabase.Replace.ANY)
 @Transactional
 public class ExpenseServiceTest {
-    @Autowired
-    private ExpenseRepository expenseRepository;
+        @Autowired
+        private ExpenseRepository expenseRepository;
 
-    @Autowired
-    private ExpenseService expenseService;
+        @Autowired
+        private ExpenseService expenseService;
 
-    @Autowired
-    private BillGroupService billGroupService;
+        @Autowired
+        private BillGroupService billGroupService;
 
-    @Test
-    void testCalculateServiceChargePct() {
-        BigDecimal expected = BigDecimal.valueOf(4);
+        @Test
+        void testCreateExpense() {
+                CreateBillGroupRequest createBillGroupRequest = new CreateBillGroupRequest(
+                                "Trip ke bandung",
+                                List.of("Daus", "Firdaus", "UsDaus"));
 
-        BigDecimal actual = expenseService.calculateServiceChargePct();
+                BillGroupResponse billGroupResponse = billGroupService.createBillGroup(createBillGroupRequest);
 
-        Assertions.assertEquals(0, expected.compareTo(actual));
-    }
+                Assertions.assertNotNull(billGroupResponse);
 
-    @Test
-    void testCalculateServiceAmount() {
-        BigDecimal chargePct = BigDecimal.valueOf(4);
-        BigDecimal expenseAmount = new BigDecimal("20333000");
-        BigDecimal expected = new BigDecimal("813320.00");
+                CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest(
+                                null,
+                                "Makan",
+                                new BigDecimal(50_500_000),
+                                billGroupResponse.participants().get(0).id(),
+                                Set.of(
+                                                billGroupResponse.participants().get(1).id(),
+                                                billGroupResponse.participants().get(2).id()));
 
-        BigDecimal actual = expenseService.calculateServiceAmount(
-                expenseAmount, chargePct);
+                ExpenseResponse expenseResponse = expenseService.createExpense(
+                                billGroupResponse.id(), createExpenseRequest);
 
-        Assertions.assertEquals(0, expected.compareTo(actual));
-    }
+                BigDecimal expectedTotal = new BigDecimal("50500000");
+                BigDecimal expectedSplitAmount = new BigDecimal("25250000.00");
 
-    @Test
-    void testCalculateServiceAmountRounding() {
-        BigDecimal chargePct = BigDecimal.valueOf(4);
-        BigDecimal expenseAmount = new BigDecimal("20500999.99");
+                Assertions.assertNotNull(expenseResponse);
+                Assertions.assertEquals(1, expenseRepository.count());
+                Assertions.assertEquals(expectedTotal, expenseResponse.total());
 
-        // 20500999.99 * 4% = 820039.9996
-        // DOWN = 820039.99
-        BigDecimal expected = new BigDecimal("820039.99");
+                // expense split check
+                Assertions.assertEquals(2, expenseResponse.forParticipants().size());
+                Assertions.assertEquals(expectedSplitAmount, expenseResponse.forParticipants().get(0).amount());
 
-        BigDecimal actual = expenseService.calculateServiceAmount(
-                expenseAmount, chargePct);
-
-        Assertions.assertEquals(0, expected.compareTo(actual));
-    }
-
-    @Test
-    void testCalculateExpenseTotal() {
-        BigDecimal expenseAmount = new BigDecimal("20333000.00");
-        BigDecimal serviceAmount = new BigDecimal("813320.00");
-
-        BigDecimal expected = new BigDecimal("21146320.00");
-
-        BigDecimal actual = expenseService.calculateExpenseTotal(
-                expenseAmount, serviceAmount);
-
-        Assertions.assertEquals(0, expected.compareTo(actual));
-    }
-
-    @Test
-    void testCalculateExpenseTotalRounded() {
-        BigDecimal expenseAmount = new BigDecimal("20500999.99");
-        BigDecimal serviceAmount = new BigDecimal("820039.99");
-
-        BigDecimal expected = new BigDecimal("21321039.98");
-
-        BigDecimal actual = expenseService.calculateExpenseTotal(
-                expenseAmount, serviceAmount);
-
-        Assertions.assertEquals(0, expected.compareTo(actual));
-    }
-
-    @Test
-    void testCreateExpense() {
-        CreateBillGroupRequest createBillGroupRequest = new CreateBillGroupRequest(
-                "Trip ke bandung",
-                List.of("Daus", "Firdaus", "UsDaus"));
-
-        BillGroupResponse billGroupResponse = billGroupService.createBillGroup(createBillGroupRequest);
-
-        Assertions.assertNotNull(billGroupResponse);
-
-        CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest(
-                null,
-                "Makan",
-                new BigDecimal(50_500_000),
-                billGroupResponse.participants().get(0).id(),
-                Set.of(
-                        billGroupResponse.participants().get(1).id(),
-                        billGroupResponse.participants().get(2).id()));
-
-        ExpenseResponse expenseResponse = expenseService.createExpense(
-                billGroupResponse.id(), createExpenseRequest);
-
-        BigDecimal expectedSubtotal = new BigDecimal("50500000.00");
-        BigDecimal expectedServiceCpt = new BigDecimal(4);
-        BigDecimal expectedServiceAmount = new BigDecimal("2020000.00");
-        BigDecimal expectedTotal = new BigDecimal("52520000.00");
-        BigDecimal expectedSplitAmount = new BigDecimal("26260000.00");
-
-        Assertions.assertNotNull(expenseResponse);
-        Assertions.assertEquals(1, expenseRepository.count());
-        Assertions.assertEquals(expectedSubtotal, expenseResponse.subtotal());
-        Assertions.assertEquals(expectedServiceCpt, expenseResponse.serviceChargeCpt());
-        Assertions.assertEquals(expectedServiceAmount, expenseResponse.serviceChargeAmount());
-        Assertions.assertEquals(expectedTotal, expenseResponse.total());
-
-        // expense split check
-        Assertions.assertEquals(2, expenseResponse.forParticipants().size());
-        Assertions.assertEquals(expectedSplitAmount, expenseResponse.forParticipants().get(0).amount());
-
-        List<String> splitParticipantNames = expenseResponse.forParticipants().stream()
-                .map(ExpenseSplitInfo::name)
-                .toList();
-        Assertions.assertTrue(
-                splitParticipantNames.containsAll(List.of("Firdaus", "UsDaus")),
-                "expected split participants [Firdaus, UsDaus] but was: " + splitParticipantNames);
-    }
+                List<String> splitParticipantNames = expenseResponse.forParticipants().stream()
+                                .map(ExpenseSplitInfo::name)
+                                .toList();
+                Assertions.assertTrue(
+                                splitParticipantNames.containsAll(List.of("Firdaus", "UsDaus")),
+                                "expected split participants [Firdaus, UsDaus] but was: " + splitParticipantNames);
+        }
 }

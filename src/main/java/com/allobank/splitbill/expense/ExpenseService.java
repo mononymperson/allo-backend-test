@@ -30,25 +30,6 @@ public class ExpenseService {
     private final ParticipantService participantService;
     private final BillGroupService billGroupService;
 
-    BigDecimal calculateServiceChargePct() {
-        String githubUsername = "mononymperson";
-        int sum = githubUsername.chars().sum();
-
-        return new BigDecimal(sum % 10);
-    }
-
-    BigDecimal calculateServiceAmount(BigDecimal amount, BigDecimal serviceChargePct) {
-        return amount
-                .multiply(serviceChargePct)
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.DOWN);
-    }
-
-    BigDecimal calculateExpenseTotal(BigDecimal amount, BigDecimal serviceAmount) {
-        return amount
-                .add(serviceAmount)
-                .setScale(2, RoundingMode.DOWN);
-    }
-
     @Transactional
     public ExpenseResponse createExpense(UUID billGroupId, CreateExpenseRequest expenseRequest) {
         validationService.validate(expenseRequest);
@@ -62,14 +43,7 @@ public class ExpenseService {
 
         Participant payer = participantService.getParticipantBy(billGroupId, expenseRequest.paidBy());
 
-        BigDecimal subtotal = expenseRequest.amount().setScale(2, RoundingMode.UNNECESSARY);
-
-        BigDecimal serviceChargePct = calculateServiceChargePct();
-
-        BigDecimal serviceChargeAmount = calculateServiceAmount(
-                expenseRequest.amount(), serviceChargePct);
-
-        BigDecimal totalExpense = expenseRequest.amount().add(serviceChargeAmount);
+        BigDecimal totalExpense = expenseRequest.amount();
 
         BigDecimal splitsAmount = totalExpense
                 .divide(BigDecimal.valueOf(participants.size()), 2, RoundingMode.DOWN);
@@ -77,9 +51,6 @@ public class ExpenseService {
         expense.setBillGroup(billGroup);
         expense.setDescription(expenseRequest.description());
         expense.setPaidBy(payer);
-        expense.setSubtotal(subtotal);
-        expense.setServiceChargeCpt(serviceChargePct);
-        expense.setServiceChargeAmount(serviceChargeAmount);
         expense.setTotal(totalExpense);
 
         expenseRepository.save(expense);

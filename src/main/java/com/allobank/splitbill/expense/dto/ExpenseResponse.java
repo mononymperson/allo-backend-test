@@ -13,9 +13,6 @@ public record ExpenseResponse(
         String description,
         ParticipantResponse paidBy,
         List<ExpenseSplitInfo> forParticipants,
-        BigDecimal serviceChargeCpt,
-        BigDecimal serviceChargeAmount,
-        BigDecimal subtotal,
         BigDecimal total) {
 
     public static ExpenseResponse from(Expense expense, List<ExpenseSplitInfo> forParticipants) {
@@ -24,9 +21,6 @@ public record ExpenseResponse(
                 expense.getDescription(),
                 ParticipantResponse.from(expense.getPaidBy()),
                 forParticipants,
-                expense.getServiceChargeCpt(),
-                expense.getServiceChargeAmount(),
-                expense.getSubtotal(),
                 expense.getTotal());
     }
 }
