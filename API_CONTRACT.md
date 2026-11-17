@@ -170,10 +170,10 @@ Response: `200 OK`
       "name": "Dinner Trip"
     },
     "summary": {
-      "totalExpenses": "300000.00",
-      "serviceChargePct": "5",
-      "serviceChargeAmount": "15000.00",
-      "grandTotal": "315000.00"
+      "totalExpenses": 300000.00,
+      "serviceChargePct": 4,
+      "serviceChargeAmount": 15000.00,
+      "grandTotal": 315000.00
     },
     "transfers": [
       {

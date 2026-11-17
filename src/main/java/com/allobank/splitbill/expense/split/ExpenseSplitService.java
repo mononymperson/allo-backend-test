@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.allobank.splitbill.common.ValidationService;
 import com.allobank.splitbill.expense.split.dto.CreateExpenseSplit;
 import com.allobank.splitbill.expense.split.dto.ExpenseSplitInfo;
+import com.allobank.splitbill.expense.split.dto.ExpenseTotalOweByParticipant;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -45,5 +46,9 @@ public class ExpenseSplitService {
 
     public List<ExpenseSplit> getSplitsBy(UUID billGroupId) {
         return expenseSplitRepository.findAllByExpense_BillGroup_Id(billGroupId);
+    }
+
+    public List<ExpenseTotalOweByParticipant> getExpenseTotalOweParticipantBy(UUID billGroupId) {
+        return expenseSplitRepository.findTotalOwesByParticipant(billGroupId);
     }
 }
